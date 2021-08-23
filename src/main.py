@@ -34,17 +34,86 @@ def sitemap():
 
 #this help us to get the information from the table. We must to do this for each of them
 @app.route('/person', methods=['GET'])
-def handle_hello():
+def getPerson():
+    persons = Person.get_all()
+    if persons:
+        return jsonify(persons),200
+    
+    return jsonify({'message': 'Error. Table not found'}), 500
 
-    response_body = {
-        "msg": "Hello, this is your GET /user response "
-    }
-
-    return jsonify(response_body), 200
 #
-@app.route('/task', methods=['GET'])
-def get_task():
-    return {"msg": 'task found'}, 404
+@app.route('/person/<int:id>/tasks', methods=['GET'])
+def get_task(id):
+    personTask = Task.get_task_by_person(id)
+    if not personTask:
+        return jsonify({'message': 'task not found'}), 200
+    return jsonify(personTask), 201
+
+#
+@app.route('/person/<int:id>/task/<int:positio>', methods = ['GET'])
+def get_specific_task(id, position):
+    personTask = Task.get_task_by_user(id)
+
+    if not personTask:
+        return jsonify({'messege': 'Not specific task found, '}), 200
+    return jsonify(personTask), 200
+
+@app.route('/person', methods=['POST'])
+def create_personTask():
+    nickmane = request.json.get('nickname', None)
+    if not (nickmane):
+        return {'error': 'Missing info'}, 400
+    
+    user = Person(nickmane = nickmane)
+    user.create()
+
+    return jsonify(user.to_dict()), 201
+
+@app.route('/person/<int:id>/task', methods = ['POST'])
+def add_new_task(id):
+    task_txt = request.json.get('task_txt', None)
+    if not (task_txt and id):
+        return {'error': 'Error'}, 400
+
+    task = Task(task_txt and id)
+    task.add_new()
+
+    return jsonify(task.to_dict()), 201
+    print("insuficiente ", request_body)
+    return jsonify(task)
+
+@app.route('/person/<int:id>', methods = ['DELETE'])
+def delete_account(id):
+    person = Person.get_by_id(id)
+
+    if person:
+        person.delete()
+        return jsonify(person.to_dict()),200
+    
+    return jsonify({'msg': 'Account not found'}),404
+
+@app.route('/person/<int:id>', methods = ['PATCH'])
+def update_account_by_id(id):
+    person = person.read_by_id(id)
+    if not person:
+        return jsonify({'messege': 'person not found'}), 404
+
+    new_nickname = request.jason.get('nickname', None)
+    if new_nickname and not person.get_by_nickmane(new_nickname):
+        person.update(new_nickname)
+        return jsonify(person.to_dict()), 200
+
+    return jsonify({'message': 'nickname exist'}), 400
+
+@app.route('/person/<int:id>/task/<int:position>', methods=['DELETE'])
+def delete_personTask(id, position):
+
+    task_to_delete = Task.get_one_task(position)
+    if(task_to_delete):
+        task_to_delete.delete()
+        return jsonify(task_to_delete.to_dict()),200
+
+    return{'error': 'Not access'}, 400
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
