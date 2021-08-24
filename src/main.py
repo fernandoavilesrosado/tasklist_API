@@ -25,7 +25,7 @@ setup_admin(app)
 # Handle/serialize errors like a JSON object
 @app.errorhandler(APIException)
 def handle_invalid_usage(error):
-    return jsonify(error.to_dict()), error.status_code
+    return jsonify(error.serialize()), error.status_code
 
 # generate sitemap with all your endpoints
 @app.route('/')
@@ -50,35 +50,27 @@ def get_task(id):
     return jsonify(personTask), 201
 
 #
-@app.route('/person/<int:id>/task/<int:positio>', methods = ['GET'])
-def get_specific_task(id, position):
-    personTask = Task.get_task_by_user(id)
-
-    if not personTask:
-        return jsonify({'messege': 'Not specific task found, '}), 200
-    return jsonify(personTask), 200
-
 @app.route('/person', methods=['POST'])
 def create_personTask():
-    nickmane = request.json.get('nickname', None)
+    nickmane = request.json.get('nickname')
     if not (nickmane):
         return {'error': 'Missing info'}, 400
     
     user = Person(nickmane = nickmane)
     user.create()
 
-    return jsonify(user.to_dict()), 201
+    return jsonify(user.serialize()), 201
 
 @app.route('/person/<int:id>/task', methods = ['POST'])
 def add_new_task(id):
-    task_txt = request.json.get('task_txt', None)
+    task_txt = request.json.get('task_txt')
     if not (task_txt and id):
         return {'error': 'Error'}, 400
 
     task = Task(task_txt and id)
     task.add_new()
 
-    return jsonify(task.to_dict()), 201
+    return jsonify(task.serialize()), 201
     print("insuficiente ", request_body)
     return jsonify(task)
 
@@ -88,32 +80,32 @@ def delete_account(id):
 
     if person:
         person.delete()
-        return jsonify(person.to_dict()),200
+        return jsonify(person.serialize()),200
     
     return jsonify({'msg': 'Account not found'}),404
 
-@app.route('/person/<int:id>', methods = ['PATCH'])
-def update_account_by_id(id):
-    person = person.read_by_id(id)
-    if not person:
-        return jsonify({'messege': 'person not found'}), 404
+#@app.route('/person/<int:id>', methods = ['PATCH'])
+#def update_account_by_id(id):
+ #   person = person.read_by_id(id)
+  #  if not person:
+   #     return jsonify({'messege': 'person not found'}), 404
 
-    new_nickname = request.jason.get('nickname', None)
-    if new_nickname and not person.get_by_nickmane(new_nickname):
-        person.update(new_nickname)
-        return jsonify(person.to_dict()), 200
+    #new_nickname = request.jason.get('nickname')
+    #if new_nickname and not person.get_by_nickmane(new_nickname):
+     #   person.update(new_nickname)
+      #  return jsonify(person.to_dict()), 200
 
-    return jsonify({'message': 'nickname exist'}), 400
+    #return jsonify({'message': 'nickname exist'}), 400
 
-@app.route('/person/<int:id>/task/<int:position>', methods=['DELETE'])
-def delete_personTask(id, position):
+#@app.route('/person/<int:id>/task/<int:position>', methods=['DELETE'])
+#def delete_personTask(id, position):
 
-    task_to_delete = Task.get_one_task(position)
-    if(task_to_delete):
-        task_to_delete.delete()
-        return jsonify(task_to_delete.to_dict()),200
+    #task_to_delete = Task.get_one_task(position)
+   # if(task_to_delete):
+       # task_to_delete.delete()
+        #return jsonify(task_to_delete.to_dict()),200
 
-    return{'error': 'Not access'}, 400
+   # return{'error': 'Not access'}, 400
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':

@@ -4,8 +4,8 @@ db = SQLAlchemy()
 
 class Person(db.Model):
     __tablename__ :'person'
-    id = db.Column(db.Integer, primary_key=True)
-    nickmane = db.Column(db.String, unique=True, nullable=False)
+    id = db.Column(db.Integer, unique=True, primary_key=True)
+    nickmane = db.Column(db.String(250), unique=False, nullable=False)
     #this is the relationship with children
     have_task = db.relationship("Task", lazy=True)
 
@@ -25,8 +25,8 @@ class Person(db.Model):
 
     @classmethod
     def get_all(cls):
-        personList = cls.query.all()
-        return [usr.to_dict() for user in user_list]
+        person_list = cls.query.all()
+        return [user.serialize() for user in person_list]
     
     @classmethod
     def get_by_id(cls, id):
@@ -49,7 +49,7 @@ class Person(db.Model):
 class Task(db.Model):
     __tablename__: 'task'
     id = db.Column(db.Integer, primary_key=True)
-    task_txt = db.Column(db.String, unique=False, nullable=False)
+    task_txt = db.Column(db.String(250), unique=False, nullable=False)
     is_active = db.Column(db.Boolean(True), nullable=False)
     #this is the relationship whit parent
     id_person = db.Column(db.Integer, db.ForeignKey("person.id"))
@@ -71,12 +71,12 @@ class Task(db.Model):
 
     @classmethod
     def get_task(cls):
-        tasks 0 cls.query.all()
+        tasks = cls.query.all()
         return [task.serialize() for task in task]
 
     @classmethod
     def get_task_by_person(cls, id):
-        specific_task_list = cls.query.filter_by(person.id = id, status = False)
+        specific_task_list = cls.query.filter_by(person.id == id, status = False)
         return [element.serialize() for element in specific_task_list]
     
     @classmethod
