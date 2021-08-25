@@ -52,11 +52,11 @@ def get_task(id):
 #
 @app.route('/person', methods=['POST'])
 def create_personTask():
-    nickmane = request.json.get('nickname')
-    if not (nickmane):
+    nickname = request.json.get('nickname')
+    if not (nickname):
         return {'error': 'Missing info'}, 400
     
-    user = Person(nickmane = nickmane)
+    user = Person(nickname = nickname)
     user.create()
 
     return jsonify(user.serialize()), 201
@@ -91,7 +91,7 @@ def delete_account(id):
    #     return jsonify({'messege': 'person not found'}), 404
 
     #new_nickname = request.jason.get('nickname')
-    #if new_nickname and not person.get_by_nickmane(new_nickname):
+    #if new_nickname and not person.get_by_nickname(new_nickname):
      #   person.update(new_nickname)
       #  return jsonify(person.to_dict()), 200
 

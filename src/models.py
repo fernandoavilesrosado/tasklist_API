@@ -5,17 +5,17 @@ db = SQLAlchemy()
 class Person(db.Model):
     __tablename__ :'person'
     id = db.Column(db.Integer, unique=True, primary_key=True)
-    nickmane = db.Column(db.String(250), unique=False, nullable=False)
+    nickname = db.Column(db.String(250), unique=False, nullable=False)
     #this is the relationship with children
     have_task = db.relationship("Task", lazy=True)
 
     def __repr__(self):
-        return f"Person {self.id}, user {self.nickmane}"#this line write the information in the window
+        return f"Person {self.id}, user {self.nickname}"#this line write the information in the window
     #this is the dictionary
     def serialize(self):
         return {
             "id": self.id,
-            "nickname": self.nickmane
+            "nickname": self.nickname
             # do not serialize the password, its a security breach
         }
 #
@@ -34,12 +34,12 @@ class Person(db.Model):
         return account
     
     def update(slef, nick):
-        self.nickmane = nickmane
+        self.nickname = nickname
         db.session.commit()
     
     @classmethod
-    def get_by_nickmane(cls,nickmane):
-        account = cls.query.filter_by(nickmane = nickmane).one_or_none()
+    def get_by_nickname(cls,nickname):
+        account = cls.query.filter_by(nickname = nickname).one_or_none()
         return person
 
     def delete(self):
